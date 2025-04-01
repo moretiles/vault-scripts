@@ -1,0 +1,12 @@
+[Unit]
+Description=Wait for vault to be unsealed
+Before=vault_podman.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/bin/cp -r /home/debian/podman/vault/certs/. /home/debian/podman/vault/live/fs/vault/certs
+
+[Install]
+RequiredBy=vault.target

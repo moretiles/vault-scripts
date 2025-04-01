@@ -1,0 +1,13 @@
+[Unit]
+Description=Wait for vault to be unsealed
+Requires=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service
+After=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/bin/sleep 35
+
+[Install]
+RequiredBy=vault.target

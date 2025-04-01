@@ -1,0 +1,10 @@
+[Unit]
+Description=Process vault-token for (%i)
+After=vault.target
+Requires=vault.target
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=/usr/local/bin/vault-tokens /etc/vault-token/%i

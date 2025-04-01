@@ -1,0 +1,11 @@
+[Unit]
+Description=Process vault-template for (%i)
+After=vault.target
+Before=%i.service
+Requires=vault.target %i.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=/usr/local/bin/vault-templates /etc/vault-template/%i

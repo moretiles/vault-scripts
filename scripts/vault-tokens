@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#set -eu
+set -mxeu
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "You are not root so the script may fail" 2>&1
+	exit 2
+fi
+
+if [[ -z "${1}" ]]; then
+	echo "You did not supply a directory of config files" 1>&2
+	exit 1
+fi
+
+for cfg in "${1}"/*; do
+	source "${cfg}"
+	curl -X POST \
+		-H "X-Vault-Request: true" \
+		-H "X-Vault-Token: $(cat "${VAULT_TOKEN}")" \
+		-d "{\"accessor\":\"$(cat "${VAULT_ACCESSOR}")\"}" \
+		https://vault.home.arpa:8200/v1/auth/token/renew-accessor
+done

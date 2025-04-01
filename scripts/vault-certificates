@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -eu
+#set -mxeu
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "You are not root so the script may fail" 2>&1
+	exit 2
+fi
+
+if [[ -z "${1}" ]]; then
+	echo "You did not supply a directory of config files" 1>&2
+	exit 1
+fi
+
+dot_name () {
+	echo "${1//./-dot-}"
+}
+
+for cfg in "${1}"/*; do
+	source "${cfg}"
+	cert_dir="${CERTIFICATE%/*}"
+	key_dir="${PRIVATE_KEY%/*}"
+	mkdir -p "${cert_dir}" "${key_dir}"
+	endpoint="$(dot_name "${DOMAIN_NAME}")"
+	server_json="$(curl --header "X-Vault-Token: $(cat "${VAULT_TOKEN}")" \
+			--request POST \
+			--data "{\"common_name\": \"${DOMAIN_NAME}\", \"ttl\": \"${TTL}\"}" \
+			https://vault.home.arpa:8200/v1/pki/issue/"${endpoint}")"
+	certificate="$(jq '.data.certificate' <<< "${server_json}" | sed 's/\\n/\n/g' | sed 's/^"\|"$//')"
+	private_key="$(jq '.data.private_key' <<< "${server_json}" | sed 's/\\n/\n/g' | sed 's/^"\|"$//')"
+	echo "${certificate}" > "${CERTIFICATE}"
+	curl http://ca.home.arpa:8202/v1/pki/issuer/default/pem >> "${CERTIFICATE}"
+	curl http://ca.home.arpa:8202/v1/pki_root/issuer/default/pem >> "${CERTIFICATE}"
+	touch "${PRIVATE_KEY}"
+	chmod 600 "${PRIVATE_KEY}"
+	echo "${private_key}" > "${PRIVATE_KEY}"
+done

@@ -1,0 +1,13 @@
+[Unit]
+Description=Get new certificate from vault for service (%i)
+After=vault.target
+Before=%i.service
+Requires=vault.target
+
+[Timer]
+RandomizedDelaySec=3600
+OnCalendar=*-*-15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

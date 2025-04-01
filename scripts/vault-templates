@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "You are not root so the script may fail" 2>&1
+	exit 2
+fi
+
+if [[ -z "${1}" ]]; then
+	echo "You did not supply a directory of config files" 1>&2
+	exit 1
+fi
+
+for cfg in "${1}"/*; do
+	echo "${cfg}"
+	source "${cfg}"
+	vault-template
+done

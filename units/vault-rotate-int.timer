@@ -1,0 +1,11 @@
+[Unit]
+Description=Rotate intermediate authority
+After=vault.target
+Requires=vault.target
+
+[Timer]
+OnCalendar=*-*-13
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Rotate intermediate certificate authority
+After=vault.target
+Requires=vault.target 
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=/usr/local/bin/vault-rotate-int

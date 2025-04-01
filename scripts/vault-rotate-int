@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -eu
+#set -mxeu
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "You are not root so the script may fail" 2>&1
+	exit 2
+fi
+
+umask 007
+
+ttl='1800h'
+vault_token=/etc/vault/root
+
+int_name="Intermediate_$(date '+%m-%d-%Y-%s')"
+csr_json="$(curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request POST \
+	--header "X-Vault-Request: true" \
+	--data "{\"common_name\": \"${int_name}\", \"ttl\": \"${ttl}\"}" \
+	https://vault.home.arpa:8200/v1/pki/intermediate/generate/internal)"
+jq '.data.csr' <<< "${csr_json}" > /tmp/csr.pem
+cert_json="$(curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request POST \
+	--header "X-Vault-Request: true" \
+	--data "{\"csr\": $(cat /tmp/csr.pem), \"format\": \"pem_bundle\", \"ttl\": \"${ttl}\"}" \
+	https://vault.home.arpa:8200/v1/pki_root/root/sign-intermediate)"
+certificate="$(jq '.data.certificate' <<< "${cert_json}")"
+confirm_json="$(curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request POST \
+	--header "X-Vault-Request: true" \
+	--data "{\"certificate\": ${certificate}}" \
+	https://vault.home.arpa:8200/v1/pki/intermediate/set-signed)"
+new_issuer="$(jq '.data.imported_issuers[0]' <<< "${confirm_json}")"
+new_issuer="${new_issuer//\"/}"
+curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request POST \
+	--header "X-Vault-Request: true" \
+	--data "{\"issuer_name\": \"${int_name}\"}" \
+	https://vault.home.arpa:8200/v1/pki/issuer/"${new_issuer}" > /dev/null
+curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request PUT \
+	--header "X-Vault-Request: true" \
+	--data "{\"crl_distribution_points\": \"http://ca.home.arpa:8202/v1/pki/issuer/${new_issuer}/crl/der\", \"issuing_certificates\": \"http://ca.home.arpa:8202/v1/pki/issuer/${new_issuer}/pem\"}" \
+	https://vault.home.arpa:8200/v1/pki/config/urls > /dev/null
+curl --header "X-Vault-Token: $(cat "${vault_token}")" \
+	--request POST \
+	--header "X-Vault-Request: true" \
+	--data "{\"default\": \"${int_name}\"}" \
+	https://vault.home.arpa:8200/v1/pki/root/replace > /dev/null
