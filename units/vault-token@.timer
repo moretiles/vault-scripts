@@ -1,0 +1,12 @@
+[Unit]
+Description=Periodically refresh token: (%i)
+After=vault.target
+Requires=vault.target
+
+[Timer]
+RandomizedDelaySec=3600
+OnCalendar=*-*-*
+Persistent=true
+
+[Install]
+WantedBy=timers.target
