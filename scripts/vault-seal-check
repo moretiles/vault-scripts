@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+check="$(curl --silent https://vault.home.arpa:8200/v1/sys/health)"
+init="$(jq .initialized <<< "${check}")"
+sealed="$(jq .sealed <<< "${check}")"
+if [[ "${init}" != "true" ]] || [[ "${sealed}" != "false" ]]; then
+    exit 1
+else
+    exit 0
+fi

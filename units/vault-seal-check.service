@@ -1,0 +1,12 @@
+[Unit]
+Description=Check if vault is unsealed
+After=network-online.target
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/local/bin/vault-seal-check
+
+[Install]
+RequiredBy=vault.target
