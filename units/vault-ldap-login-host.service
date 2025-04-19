@@ -1,0 +1,13 @@
+[Unit]
+Description=Login to vault using ldap
+Requires=vault-seal-check.service
+After=vault-seal-check.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/local/bin/vault-ldap-login
+
+[Install]
+RequiredBy=vault.target
