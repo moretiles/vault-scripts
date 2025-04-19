@@ -1,0 +1,13 @@
+[Unit]
+Description=Wait for vault to be unsealed
+Requires=vault-wait.service ldap_podman.service
+After=vault-wait.service ldap_podman.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/local/bin/vault-ldap-login
+
+[Install]
+RequiredBy=vault.target

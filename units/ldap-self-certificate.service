@@ -1,0 +1,11 @@
+[Unit]
+Description=Do the job of getting new certificate for openldap
+After=vault.target
+Requires=vault.target 
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=/usr/local/bin/vault-certificates /etc/vault-certificate/ldap_podman
+ExecStartPost=/usr/local/bin/vault-ca-certs /home/debian/podman/ldap/certs/ca.crt
