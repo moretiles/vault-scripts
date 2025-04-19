@@ -1,0 +1,12 @@
+[Unit]
+Description=Wait for vault to be unsealed
+Before=ldap_podman.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=10
+ExecStart=/usr/bin/cp -r /home/debian/podman/ldap/certs/. /home/debian/podman/ldap/live/fs/etc/outofband
+
+[Install]
+RequiredBy=vault.target

@@ -11,13 +11,14 @@ if [[ "$(id -u)" != "0" ]]; then
 	exit 2
 fi
 
-if [[ -z "${1}" ]]; then
-	echo "You did not supply a directory of config files" 1>&2
-	exit 1
-fi
-
 curl --silent -X POST \
     -H "X-Vault-Request: true" \
     -d "{\"password\":\"$(cat "${ldap_login}")\"}" \
-    https://vault.home.arpa:8200/v1/auth/ldap/login/"${myhostname}" | \
-    jq -r '.auth.client_token'
+    https://vault.home.arpa:8200/v1/auth/ldap/login/user_"${myhostname}" | \
+    jq -r '.auth.client_token' > /etc/outofband/vault_token
+
+curl --silent \
+    --header "X-Vault-Token: $(cat /etc/outofband/vault_token)" \
+    --data "{\"token\": \"$(cat /etc/outofband/vault_token)\"}" \
+    https://vault.home.arpa:8200/v1/auth/token/lookup | \
+    jq -r '.data.accessor' > /etc/outofband/vault_token_accessor

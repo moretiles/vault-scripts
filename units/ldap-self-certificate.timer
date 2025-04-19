@@ -1,0 +1,11 @@
+[Unit]
+Description=Get new certificate from vault for vault
+After=vault.target
+Requires=vault.target
+
+[Timer]
+OnCalendar=*-*-14
+Persistent=true
+
+[Install]
+WantedBy=timers.target

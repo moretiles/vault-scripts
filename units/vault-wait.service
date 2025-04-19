@@ -1,7 +1,7 @@
 [Unit]
 Description=Wait for vault to be unsealed
-Requires=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service
-After=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service
+Requires=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service ldap_podman.service
+After=vault_podman.service vault-unseal_podman.service vault-nginx_podman.service ldap_podman.service
 
 [Service]
 Type=oneshot

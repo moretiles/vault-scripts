@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ -z "${1}" ]]; then
+	exit 1
+fi
+
+curl http://ca.home.arpa:8202/v1/pki/issuer/default/pem > "${1}"
+curl http://ca.home.arpa:8202/v1/pki_root/issuer/default/pem >> "${1}"
