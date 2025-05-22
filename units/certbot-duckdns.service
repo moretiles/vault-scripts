@@ -1,0 +1,10 @@
+[Unit]
+Description=Service to get new certs from LetsEncrypt for DuckDNS domains
+After=bind-eth_podman.service vault.target
+Requires=bind-eth_podman.service vault.target
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=/usr/local/bin/certbot-duckdns

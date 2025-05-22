@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer to update duckdns ip for %i.duckdns.org
+After=bind-eth_podman.service
+Requires=bind-eth_podman.service
+
+[Timer]
+OnCalendar=Hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

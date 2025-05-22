@@ -1,0 +1,12 @@
+[Unit]
+Description=Timer to get new certs from LetsEncrypt for DuckDNS domains
+After=bind-eth_podman.service vault.target
+Requires=bind-eth_podman.service vault.target
+
+[Timer]
+RandomizedDelaySec=3600
+OnCalendar=*-*-13
+Persistent=true
+
+[Install]
+WantedBy=timers.target
