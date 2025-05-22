@@ -1,0 +1,10 @@
+[Unit]
+Description=Update duckdns domain for %i.duckdns.org
+After=bind-eth_podman.service
+Requires=bind-eth_podman.service
+
+[Service]
+Type=oneshot
+Restart=on-failure
+TimeoutStopSec=5
+ExecStart=curl --get --data-urlencode "domains@/etc/duckdns/%i/domain" --data-urlencode "token@/etc/duckdns/%i/token" --data-urlencode 'verbose=true' 'https://www.duckdns.org/update'

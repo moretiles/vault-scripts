@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -eou pipefail
+
+if [[ ! $(id -u) == "0" ]]; then
+  echo FAILED, NOT ROOT 1>&2
+  exit 1
+fi
+
+domain="${CERTBOT_DOMAIN%%\.*}"
+curl --get --data-urlencode "domains=${domain}" --data-urlencode "token@/etc/duckdns/${domain}/token" --data-urlencode "txt=${CERTBOT_VALIDATION}" --data-urlencode 'verbose=true' 'https://www.duckdns.org/update'
+unset domain
+sleep 15

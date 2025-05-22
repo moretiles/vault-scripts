@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -eou pipefail
+
+if [[ ! $(id -u) == "0" ]]; then
+	echo FAILED, NOT ROOT 1>&2
+	exit 1
+fi
+
+for domain_dir in /etc/duckdns/*/; do
+	domain="$(cat "${domain_dir}/domain")"
+	email="$(cat "${domain_dir}/email")"
+	certbot -d "${domain}".duckdns.org --manual --manual-auth-hook /usr/local/bin/certbot-duckdns-auth-hook --preferred-challenges dns --force-renewal -n --agree-tos --email "${email}" certonly
+	unset domain
+done
