@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -eou pipefail
+
+if [[ ! "$(id -u)" == '0' ]]; then
+  echo "YOU ARE NOT ROOT, FAILED" 1>&2
+  exit 1
+fi
+
+# I am very unhappy that Bind9 does not support the option to treat the bare domain name,
+# i.e. example.com, as a record type that can be forwarded while all of the subdomains
+# within a zone are then controlled by that zone. Thankfully this hacky method will do.
+
+for dir in /etc/duckdns/*; do
+  domain="$(cat "${dir}"/domain).duckdns.org"
+  echo dig "${domain}" @1.1.1.1 | grep -v '^\;' | grep "${domain}\." | awk '{print $5}' | head -n 1
+  unset domain
+done
