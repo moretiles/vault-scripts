@@ -1,7 +1,5 @@
 [Unit]
 Description=Vault is online and unsealed
-#After=podman.socket vault_podman.service vault-unseal_podman.service vault-nginx_podman.service vault-wait.service
-#Requires=podman.socket vault_podman.service vault-unseal_podman.service vault-nginx_podman.service vault-wait.service
 
 [Install]
 WantedBy=multi-user.target

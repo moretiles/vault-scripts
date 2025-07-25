@@ -1,7 +1,7 @@
 [Unit]
 Description=Do the job of getting new certificate for openldap
-After=vault.target
-Requires=vault.target 
+After=vault-seal-check.service
+Requires=vault-seal-check.service 
 
 [Service]
 Type=oneshot

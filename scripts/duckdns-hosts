@@ -1,8 +1,6 @@
 #!/bin/bash
 
-set -eou pipefail
-
-if [[ ! "$(id -u)" == '0' ]]; then
+if [[ ! "$(id -u)" = '0' ]]; then
   echo "YOU ARE NOT ROOT, FAILED" 1>&2
   exit 1
 fi
@@ -13,6 +11,9 @@ fi
 
 for dir in /etc/duckdns/*; do
   domain="$(cat "${dir}"/domain).duckdns.org"
-  echo dig "${domain}" @1.1.1.1 | grep -v '^\;' | grep "${domain}\." | awk '{print $5}' | head -n 1
+  resolves_to="$(dig "${domain}" @1.1.1.1 | grep -v '^\;' | grep "${domain}\." | awk '{print $5}' | head -n 1)"
+  sed -i "/${domain}/d" /etc/hosts
+  echo "${resolves_to}	${domain}" >> /etc/hosts
+  unset resolves_to
   unset domain
 done
