@@ -1,7 +1,7 @@
 [Unit]
 Description=Process vault-token for (%i)
-After=vault.target
-Requires=vault.target
+After=vault-seal-check.service
+Requires=vault-seal-check.service
 
 [Service]
 Type=oneshot

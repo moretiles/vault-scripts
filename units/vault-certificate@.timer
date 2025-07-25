@@ -1,8 +1,8 @@
 [Unit]
 Description=Get new certificate from vault for service (%i)
-After=vault.target
+After=vault-seal-check.service
 Before=%i.service
-Requires=vault.target
+Requires=vault-seal-check.service
 
 [Timer]
 RandomizedDelaySec=3600
